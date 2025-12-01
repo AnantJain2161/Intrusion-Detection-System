@@ -1,176 +1,245 @@
-# **Deep Learning–Based Intrusion Detection System (DL-IDS)**
+# Deep Learning–Based Intrusion Detection System (DL-IDS)
 
 ---
 
-## **1. Introduction**
+## Abstract
 
-This markdown presents a consolidated overview of our research proposal and literature-driven insights for building a **Deep Learning–based Intrusion Detection System (DL-IDS)**. The work focuses on addressing modern cybersecurity threats—particularly the surge in sophisticated, high-frequency network attacks that overwhelm traditional security systems.
-
-According to *Cybersecurity Ventures*, by **2031**, a ransomware attack is expected **every 2 seconds**, amounting to **43,200 attacks per day**, a drastic rise from 7,850 daily attacks in 2021 (Slide 4) . This motivates the urgent need for scalable, adaptive, and robust intrusion detection solutions powered by deep learning.
+This project investigates modern deep learning architectures for intrusion detection on IoT and network traffic datasets. Using the CIC-IoT2023 dataset and a range of DL methods (MLP, CNN, LSTM, Autoencoder, and hybrid AE+LSTM+CNN), we compare performance across architectures, address class imbalance and real-time constraints, and explore model compression via knowledge distillation. The best performing pipeline — an Autoencoder + Extended LSTM + CNN hybrid — achieved **98.18% accuracy** and **F1 score 0.9802** on the test split.
 
 ---
 
-## **2. Background of the Study**
+## Table of Contents
 
-Modern enterprise networks experience:
-
-* Massive, continuous, high-velocity traffic
-* Complex and evolving attack patterns
-* Highly imbalanced classes (benign vs attacks)
-* Zero-day vulnerabilities
-* Adversarial manipulations designed to evade detection
-
-Traditional IDS systems (signature-based, rule-based, shallow ML models) fail to keep up.
-Hence, our study aims to explore DL architectures capable of **adaptive, explainable, and real-time intrusion detection**.
-
----
-
-## **3. Problem Statement**
-
-Given high-volume, evolving network traffic with severe class imbalance, we aim to design a DL-IDS that:
-
-1. **Detects diverse attack types**: DoS, DDoS, Port Scan, Brute Force, Infiltration, etc.
-2. **Achieves high recall (>95%)** to minimize false negatives.
-3. **Maintains high precision (>90%)** to reduce alert fatigue.
-4. **Operates in real-time** (<100 ms inference latency).
-5. **Adapts to zero-day attacks & adversarial perturbations**.
-6. **Maintains robustness** against evasion techniques.
-7. **Provides explainability** for operator trust.
+- [Motivation](#motivation)
+- [Dataset: CIC-IoT2023 (overview)](#dataset-cic-iot2023-overview)
+- [Problem Statement & Objectives](#problem-statement--objectives)
+- [Methodology & Model Architectures](#methodology--model-architectures)
+  - [Preprocessing](#preprocessing)
+  - [Architectures Evaluated](#architectures-evaluated)
+- [Mermaid Architecture Diagrams](#mermaid-architecture-diagrams)
+- [Experiments & Metrics](#experiments--metrics)
+- [Results & Key Observations](#results--key-observations)
+- [Knowledge Distillation (Model Compression)](#knowledge-distillation-model-compression)
+- [Limitations & Practical Considerations](#limitations--practical-considerations)
+- [Reproducible Repo Structure (recommended)](#reproducible-repo-structure-recommended)
+- [Next Steps & Research Directions](#next-steps--research-directions)
+- [References & Source](#references--source)
 
 ---
 
+## Motivation
 
-## **4. Review of Deep Learning Models from Literature**
-
-The presentation synthesizes results from several influential research works.
-Below is a structured summary of each.
+- Rapid increase in cyberattacks (e.g., ransomware predictions) and IoT device vulnerabilities motivate improved, adaptive IDS solutions. The slides report that businesses may face dramatically more frequent attacks by 2031; this motivates resilient ML/DL-based detection systems.
 
 ---
 
-### **4.1 Multilayer Perceptron (MLP)**
+## Dataset: CIC-IoT2023 (overview)
 
-* Feed-forward neural network with multiple dense layers.
-* Captures basic non-linear patterns in network traffic.
-* Paper-reported results show **modest accuracy (~85%)** with rapid convergence.
+Key dataset statistics:
 
-**Limitations:** Weak at modeling sequential dependencies, limited generalization to unseen attacks.
+- **Files:** 169 files (combined)
+- **Features:** 47 unique columns (features)
+- **Samples (total):** ~46,686,579 records (combined)
+- **Attack types:** 34 unique attack classes (including many DDoS variants, Mirai, Recon, etc.)
 
----
+### Data Characteristics
 
-### **4.2 Convolutional Neural Network (1D-Conv)**
-
-* Learns spatial-temporal patterns in flows.
-* Demonstrates steadily improving training/testing accuracy across epochs.
-* Robust in extracting hierarchical features from raw network traces.
-
-**Strength:** Good for structured traffic patterns.
-**Limitation:** Struggles with long-range temporal dependencies.
+- Highly imbalanced: ~97.6% malicious vs small benign proportion in aggregated visualization
+- Rich feature set suitable for both time-series sequence models (LSTM) and feature-based DL (CNN, Autoencoders)
 
 ---
 
-### **4.3 Autoencoders (AE / Denoising AE)**
+## Problem Statement & Objectives
 
-**Binary-class performance:**
+**Primary goal:** Design a DL-IDS capable of accurate, real-time detection across diverse IoT/network attack types while being robust and explainable.
 
-* Detection Rate (DR): **95.65%**
-* False Alarm (FA): **0.35%**
-* Accuracy: **96.53%**
+### Operational Objectives
 
-**Multi-class performance:**
-
-* DR: **94.53%**
-* FA: **0.42%**
-* Accuracy: **94.71%**
-
-Autoencoders excel at anomaly detection and unsupervised representation learning.
+1. Detect diverse attack types (DoS, DDoS, Port Scan, Mirai, Recon, MITM, etc.)
+2. High recall (>95%) to minimize missed attacks
+3. High precision (>90%) to reduce false alarms
+4. Real-time inference latency target: <100 ms per decision
+5. Robust to zero-day and adversarial perturbations; provide operator-interpretable outputs
 
 ---
 
-### **4.4 Enhanced LSTM (E-LSTM)**
+## Methodology & Model Architectures
 
-* Strong at capturing long sequential dependencies in network data.
-* Architecture includes stacked LSTM layers → flatten → dense output.
-* Training/validation curves show stable convergence and generalization.
+### Preprocessing
 
-**Strength:** Superior temporal modeling for multi-stage attacks.
-**Limitation:** High computational cost.
+- **Feature engineering:** One-hot encoding for categorical fields; numeric scaling using `StandardScaler`
+- **Handling imbalance:** Class weighting, careful train/test splitting, and anomaly-aware approaches (Autoencoders). The dataset supports both binary and multiclass tasks
 
----
+### Architectures Evaluated
 
-## **5. Comparative Analysis of Related Work**
-
-This provides a comparison table of methods, advantages, and challenges across major research papers .
-
-### **Highlights:**
-
-| Method                    | Key Advantages                        | Main Challenges                            |
-| ------------------------- | ------------------------------------- | ------------------------------------------ |
-| LSTM RNN                  | Models long sequences                 | Requires large labeled datasets            |
-| DBN                       | Scalable hierarchical representation  | Difficulty detecting minority attack types |
-| CNN-1D                    | Automated feature extraction          | High compute cost                          |
-| Autoencoder               | Unsupervised, detects unknown threats | Limited interpretability                   |
-| Random Forest / SVM       | Strong classical baselines            | Struggles with adversarial noise           |
-| DRL-based IDS             | Adaptive threat learning              | Hard to deploy; compute-heavy              |
-| Signature-Based Detection | Precise for known threats             | Cannot detect zero-days                    |
-| Ensemble Classical ML     | Robust                                | Needs real-world validation                |
+- **Baseline classical:** Random Forest, clustering (Mini-Batch KMeans) for baseline comparisons
+- **Deep learning models:**
+  - **MLP (Dense)** with >10 layers (paper-style MLP)
+  - **1-D CNN** and **2-D CNN** variants (feature maps from tabular/time windows)
+  - **LSTM-Dense:** Stacked LSTM layers with dropout and dense output (multiple LSTM variants tested)
+  - **Stacked Deep Autoencoder (DAE):** Multiple autoencoder stages for unsupervised representation + classification head
+  - **Hybrid AE + XLSTM + CNN:** Autoencoder for compression, extended LSTM for temporal patterns, CNN for local pattern extraction — best empirical results
 
 ---
 
-## **6. Experiment Results (Internal Models)**
+## Mermaid Architecture Diagrams
 
-### **6.1 Random Forest **
+> These diagrams mirror the flowcharts presented in the PDF. Copy into GitHub README or any Markdown that supports Mermaid.
 
-* Shows strong precision/recall trends across batches.
-* Performs well as a baseline, but limited against unseen or evolving attacks.
+### 1) LSTM → Dense (Teacher model example)
 
-### **6.2 Clustering (Mini-Batch K-Means) **
+```mermaid
+graph TD
+    Input[Input Features timesteps] --> LSTM1[LSTM 128 / return_sequences:true]
+    LSTM1 --> Dropout1[Dropout]
+    Dropout1 --> LSTM2[LSTM 64 / return_sequences:false]
+    LSTM2 --> Dense1[FC 64 -> ReLU]
+    Dense1 --> Dense2[FC 32 -> ReLU]
+    Dense2 --> Output[FC num_classes -> Softmax]
+```
 
-* Accuracy: **74.92%**
-* Balanced Accuracy: **33.37%**
-* Weighted F1: **68.60%**
-* Key issue: **severe class imbalance** heavily degrades performance.
-* Struggles especially with rare attack classes.
+### 2) Student Distilled LSTM (Small)
 
-### **6.3 AE-XLSTM-CNN Hybrid Model **
+```mermaid
+graph TD
+    Input2[Input Features timesteps] --> SLSTM[LSTM 32]
+    SLSTM --> SDense[FC 32 -> ReLU]
+    SDense --> SOutput[FC num_classes -> Softmax]
+```
 
-**Test Results:**
+### 3) AE → XLSTM → CNN (Hybrid pipeline)
 
-* Loss: **0.0532**
-* Accuracy: **98.18%**
-* F1 Score: **0.9802**
-* Samples Evaluated: **234,741**
-
-This hybrid pipeline leverages:
-
-* Autoencoder → feature compression
-* LSTM → temporal pattern extraction
-* CNN → hierarchical feature refinement
-
-This is the **strongest performing model** across all reviewed architectures.
-
----
-
-## **7. Key Takeaways**
-
-1. Deep Learning significantly outperforms classical ML for IDS.
-2. Hybrid architectures (AE + LSTM + CNN) deliver the strongest, most balanced performance.
-3. Zero-day attack detection requires anomaly-aware models like Autoencoders and sequence models.
-4. Real-world deployment requires:
-
-   * low latency
-   * adversarial robustness
-   * explainability
-   * handling extreme class imbalance
-   
-5. There is strong market demand for scalable IDS solutions that incorporate deep learning and self-adaptation.
+```mermaid
+graph TD
+    Raw[Raw / Windowed Features] --> AE[Autoencoder Encoder bottleneck]
+    AE --> Bottleneck[Bottleneck Vector]
+    Bottleneck --> XLSTM[Extended LSTM stacked LSTM]
+    XLSTM --> CNN[1D-CNN Layers conv -> pool -> flatten]
+    CNN --> Classifier[Dense -> Softmax Output]
+```
 
 ---
 
-## **8. Conclusion**
+## Experiments & Metrics
 
-This work provides a rigorous literature analysis and model study for next-generation Intrusion Detection Systems driven by Deep Learning. The reviewed models demonstrate that **hybrid architectures** present the best trade-off between accuracy, robustness, and real-time operational capability.
+Primary metrics reported: Accuracy, Precision, Recall, F1-score, AUC where applicable. Loss functions: Categorical Cross-Entropy. Optimizer: Adam (default in many runs).
 
-Future work includes integrating adversarial training, SHAP-based interpretability, and end-to-end deployment using streaming frameworks.
+Representative experiment notes:
+
+- **Random Forest** used as a baseline: precision/recall curves across training batches provided
+- **Clustering baseline (Mini-Batch KMeans):** Balanced accuracy and F1 indicate severe class imbalance challenges
+- **LSTM variants:** Smaller LSTM (accuracy ~0.8749) vs larger LSTM (accuracy ~0.9643) depending on params and dataset subset
 
 ---
 
+## Results & Key Observations
+
+### Top-line Result (Final Best Model)
+
+**AE-XLSTM-CNN Hybrid** — Test Loss: 0.0532, Accuracy: 98.18%, F1: 0.9802 on a test set of 234,741 samples
+
+### Other Model Highlights
+
+- **Autoencoder-Dense:** Test accuracy ~0.5808 (performed poorly for direct classification when trained in multitask setting)
+- **LSTM-Dense smaller:** Accuracy ~0.8749 (Precision ~0.8847)
+- **LSTM-Dense larger:** Accuracy ~0.9643 (Precision ~0.9634)
+
+### Key Observations
+
+- Autoencoder + LSTM + CNN hybrid offers the best trade-off between representational power and robustness
+- Overfitting is a risk for overly complex models on tabular data — simpler architectures sometimes generalize better
+- Memory constraints required batch processing and careful resource management
+
+---
+
+## Knowledge Distillation (Model Compression)
+
+The project explores teacher→student distillation to produce lightweight models:
+
+### Teacher Model (Example)
+
+Input → LSTM(128) → Dropout → LSTM(64) → Dropout → FC(64) → ReLU → FC(32) → ReLU → FC(num_classes)
+
+### Student Model (Distilled)
+
+Input → LSTM(32) → Dropout → FC(32) → ReLU → FC(num_classes)
+
+### Loss Function (Student)
+
+- **Soft loss:** KL(soft_teacher_logits, soft_student_logits) with temperature T (example T=4) weighted by α (example α=0.7)
+- **Hard loss:** CrossEntropy(student_logits, true_labels)
+- **Final loss:** α × SoftLoss + (1 − α) × HardLoss
+
+### Performance
+
+- **Teacher performance:** Accuracy ~0.9611, F1 ~0.9598
+- **Student validation best:** ~0.8817 in a given experiment
+
+---
+
+## Limitations & Practical Considerations
+
+- **Class imbalance:** Some attack classes are severely underrepresented and require tailored strategies (oversampling, focal loss, synthesized samples, or anomaly detection approaches)
+- **Resource constraints:** High memory and compute needs necessitate micro-batching and possibly streaming architectures for deployment
+- **Overfitting risk:** Complex hybrid models may overfit tabular traffic features; cross-validation and simpler architectures can sometimes generalize better
+- **Operationalization:** Real-time demands (<100ms) may require model pruning, quantization, or on-device distillation
+
+---
+
+## Reproducible Repo Structure (recommended)
+
+```
+/
+├── README.md
+├── requirements.txt
+├── src/
+│   ├── data_ingest.py
+│   ├── preprocessing.py
+│   ├── models/
+│   │   ├── lstm_dense.py
+│   │   ├── ae.py
+│   │   ├── conv1d.py
+│   │   ├── hybrid_ae_xlstm_cnn.py
+│   │   └── distillation.py
+│   ├── train.py
+│   └── evaluate.py
+├── notebooks/
+│   ├── eda.ipynb
+│   └── experiments.ipynb
+├── data/
+│   ├── raw/
+│   └── processed/
+├── results/
+│   ├── figures/
+│   └── metrics/
+└── docs/
+    └── slides.pdf  # IDS-DL.pdf (source)
+```
+
+---
+
+## Next Steps & Research Directions
+
+- **Adversarial robustness:** Adversarial training and certified defenses for evasion attacks
+- **Explainability:** Integrate SHAP / LIME for operator-level explanations of alerts
+- **Streaming deployment:** Implement low-latency inference with TensorFlow/TFLite or ONNX (prune/quantize student model)
+- **Data augmentation for rare attacks:** Generative augmentation (GANs / conditional synthesis) to address class imbalance
+- **Ensemble + meta-learner:** Combine anomaly detectors (AE) with discriminative models (LSTM/CNN) using a meta-classifier for calibrated alerts
+
+---
+
+## References & Source
+
+All content in this README is based on the uploaded project document `IDS-DL.pdf`. For full tables, charts and raw slide content, please see the PDF.
+
+### Selected Citations
+
+- Erskine, S.K. (2025). Real-Time Large-Scale Intrusion Detection and Prevention System (IDPS) CICIoT Dataset Traffic Assessment Based on Deep Learning. *Applied System Innovation*.
+- Farahnakian, F., & Heikkonen, J. (2018). A deep auto-encoder based approach for intrusion detection. *ICACT 2018*.
+- Meena, G., & Indian, A. (2025). IDS-IoT: Enhanced LSTM. *Artificial Intelligence and Applications*.
+
+---
+
+## Acknowledgements
+
+This README was prepared from the slides / report provided in `IDS-DL.pdf`. The diagrams and numerical values (accuracy, F1, loss, dataset counts, model tables) are taken from that document and its figures.
