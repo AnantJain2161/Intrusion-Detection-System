@@ -209,8 +209,7 @@ Input → LSTM(32) → Dropout → FC(32) → ReLU → FC(num_classes)
 ├── results/
 │   ├── figures/
 │   └── metrics/
-└── docs/
-    └── slides.pdf  # IDS-DL.pdf (source)
+
 ```
 
 ---
