@@ -39,32 +39,15 @@ Given high-volume, evolving network traffic with severe class imbalance, we aim 
 
 ---
 
-## **4. Theoretical Framework**
 
-The conceptual framing is based on three foundational theories:
-
-### **4.1 Innovation Adoption Theory**
-
-Explains how organizations adopt emerging IDS technologies based on perceived usefulness, complexity, and compatibility.
-
-### **4.2 Market Segmentation Theory**
-
-Helps classify potential enterprise users (e.g., SMEs, cloud providers, critical infrastructure) and tailor deployment strategies.
-
-### **4.3 Product Differentiation Theory**
-
-Guides design of DL-IDS features that outperform traditional IDS in accuracy, scalability, and adaptability.
-
----
-
-## **5. Review of Deep Learning Models from Literature**
+## **4. Review of Deep Learning Models from Literature**
 
 The presentation synthesizes results from several influential research works.
 Below is a structured summary of each.
 
 ---
 
-### **5.1 Multilayer Perceptron (MLP)**
+### **4.1 Multilayer Perceptron (MLP)**
 
 * Feed-forward neural network with multiple dense layers.
 * Captures basic non-linear patterns in network traffic.
@@ -74,7 +57,7 @@ Below is a structured summary of each.
 
 ---
 
-### **5.2 Convolutional Neural Network (1D-Conv)**
+### **4.2 Convolutional Neural Network (1D-Conv)**
 
 * Learns spatial-temporal patterns in flows.
 * Demonstrates steadily improving training/testing accuracy across epochs.
@@ -85,7 +68,7 @@ Below is a structured summary of each.
 
 ---
 
-### **5.3 Autoencoders (AE / Denoising AE)**
+### **4.3 Autoencoders (AE / Denoising AE)**
 
 **Binary-class performance:**
 
@@ -103,7 +86,7 @@ Autoencoders excel at anomaly detection and unsupervised representation learning
 
 ---
 
-### **5.4 Enhanced LSTM (E-LSTM)**
+### **4.4 Enhanced LSTM (E-LSTM)**
 
 * Strong at capturing long sequential dependencies in network data.
 * Architecture includes stacked LSTM layers → flatten → dense output.
@@ -114,7 +97,7 @@ Autoencoders excel at anomaly detection and unsupervised representation learning
 
 ---
 
-## **6. Comparative Analysis of Related Work**
+## **5. Comparative Analysis of Related Work**
 
 This provides a comparison table of methods, advantages, and challenges across major research papers .
 
@@ -133,14 +116,14 @@ This provides a comparison table of methods, advantages, and challenges across m
 
 ---
 
-## **7. Experiment Results (Internal Models)**
+## **6. Experiment Results (Internal Models)**
 
-### **7.1 Random Forest **
+### **6.1 Random Forest **
 
 * Shows strong precision/recall trends across batches.
 * Performs well as a baseline, but limited against unseen or evolving attacks.
 
-### **7.2 Clustering (Mini-Batch K-Means) **
+### **6.2 Clustering (Mini-Batch K-Means) **
 
 * Accuracy: **74.92%**
 * Balanced Accuracy: **33.37%**
@@ -148,7 +131,7 @@ This provides a comparison table of methods, advantages, and challenges across m
 * Key issue: **severe class imbalance** heavily degrades performance.
 * Struggles especially with rare attack classes.
 
-### **7.3 AE-XLSTM-CNN Hybrid Model **
+### **6.3 AE-XLSTM-CNN Hybrid Model **
 
 **Test Results:**
 
@@ -167,7 +150,7 @@ This is the **strongest performing model** across all reviewed architectures.
 
 ---
 
-## **8. Key Takeaways**
+## **7. Key Takeaways**
 
 1. Deep Learning significantly outperforms classical ML for IDS.
 2. Hybrid architectures (AE + LSTM + CNN) deliver the strongest, most balanced performance.
@@ -183,7 +166,7 @@ This is the **strongest performing model** across all reviewed architectures.
 
 ---
 
-## **9. Conclusion**
+## **8. Conclusion**
 
 This work provides a rigorous literature analysis and model study for next-generation Intrusion Detection Systems driven by Deep Learning. The reviewed models demonstrate that **hybrid architectures** present the best trade-off between accuracy, robustness, and real-time operational capability.
 
