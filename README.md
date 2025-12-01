@@ -1,4 +1,4 @@
-# **Deep Learning–Based Intrusion Detection System (DL-IDS): Literature Review & Model Insights**
+# **Deep Learning–Based Intrusion Detection System (DL-IDS)**
 
 ---
 
