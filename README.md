@@ -16,14 +16,13 @@ This project investigates modern deep learning architectures for intrusion detec
 - [Methodology & Model Architectures](#methodology--model-architectures)
   - [Preprocessing](#preprocessing)
   - [Architectures Evaluated](#architectures-evaluated)
-- [Mermaid Architecture Diagrams](#mermaid-architecture-diagrams)
+- [Architecture Diagrams](#mermaid-architecture-diagrams)
 - [Experiments & Metrics](#experiments--metrics)
 - [Results & Key Observations](#results--key-observations)
 - [Knowledge Distillation (Model Compression)](#knowledge-distillation-model-compression)
 - [Limitations & Practical Considerations](#limitations--practical-considerations)
 - [Reproducible Repo Structure (recommended)](#reproducible-repo-structure-recommended)
-- [Next Steps & Research Directions](#next-steps--research-directions)
-- [References & Source](#references--source)
+- [Future Work & Research Directions](#next-steps--research-directions)
 
 ---
 
@@ -51,7 +50,7 @@ Key dataset statistics:
 
 ## Problem Statement & Objectives
 
-**Primary goal:** Design a DL-IDS capable of accurate, real-time detection across diverse IoT/network attack types while being robust and explainable.
+**Primary goal:** Designing a DL-IDS capable of accurate, real-time detection across diverse IoT/network attack types while being robust and explainable.
 
 ### Operational Objectives
 
@@ -82,9 +81,7 @@ Key dataset statistics:
 
 ---
 
-## Mermaid Architecture Diagrams
-
-> These diagrams mirror the flowcharts presented in the PDF. Copy into GitHub README or any Markdown that supports Mermaid.
+## Architecture Diagrams
 
 ### 1) LSTM → Dense (Teacher model example)
 
@@ -186,7 +183,7 @@ Input → LSTM(32) → Dropout → FC(32) → ReLU → FC(num_classes)
 
 ---
 
-## Reproducible Repo Structure (recommended)
+## Reproducible Repo Structure
 
 ```
 /
@@ -218,7 +215,7 @@ Input → LSTM(32) → Dropout → FC(32) → ReLU → FC(num_classes)
 
 ---
 
-## Next Steps & Research Directions
+## Future Work & Research Directions
 
 - **Adversarial robustness:** Adversarial training and certified defenses for evasion attacks
 - **Explainability:** Integrate SHAP / LIME for operator-level explanations of alerts
@@ -228,18 +225,3 @@ Input → LSTM(32) → Dropout → FC(32) → ReLU → FC(num_classes)
 
 ---
 
-## References & Source
-
-All content in this README is based on the uploaded project document `IDS-DL.pdf`. For full tables, charts and raw slide content, please see the PDF.
-
-### Selected Citations
-
-- Erskine, S.K. (2025). Real-Time Large-Scale Intrusion Detection and Prevention System (IDPS) CICIoT Dataset Traffic Assessment Based on Deep Learning. *Applied System Innovation*.
-- Farahnakian, F., & Heikkonen, J. (2018). A deep auto-encoder based approach for intrusion detection. *ICACT 2018*.
-- Meena, G., & Indian, A. (2025). IDS-IoT: Enhanced LSTM. *Artificial Intelligence and Applications*.
-
----
-
-## Acknowledgements
-
-This README was prepared from the slides / report provided in `IDS-DL.pdf`. The diagrams and numerical values (accuracy, F1, loss, dataset counts, model tables) are taken from that document and its figures.
