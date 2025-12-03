@@ -235,6 +235,10 @@ Distillation objective:
 
 Observations: Student models trade some accuracy for much lower inference cost; further multi-teacher distillation and architecture search are planned. 
 
+
+<img width="719" height="388" alt="image" src="https://github.com/user-attachments/assets/137fd8ed-d35b-4f1f-8f0d-44f01effc0f2" />
+
+
 ---
 
 
