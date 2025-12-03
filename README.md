@@ -178,7 +178,8 @@ Knowledge distillation experiments: teacher (larger LSTM stacks) → student (co
 * Combined loss: reconstruction (MSE) + classification (Cross-Entropy) with weighting factor α for trade-off. Used for anomaly-style detection and representation learning. 
 
 
-<img width="588" height="323" alt="image" src="https://github.com/user-attachments/assets/21fcebd4-ec56-49af-b235-5e2c1bc2d4ff" />
+<img width="588" height="319" alt="Screenshot 2025-12-03 231254" src="https://github.com/user-attachments/assets/c331bd3b-0eec-403c-8974-99c140ffe787" />
+
 
 
 
@@ -191,7 +192,8 @@ Knowledge distillation experiments: teacher (larger LSTM stacks) → student (co
 
 * Effective at local pattern extraction across sequences. 
 
-<img width="736" height="399" alt="image" src="https://github.com/user-attachments/assets/c29bd16b-9d62-42a9-98b0-305db68f0954" />
+<img width="729" height="395" alt="Screenshot 2025-12-03 231227" src="https://github.com/user-attachments/assets/dd4708fa-b980-45ee-b836-dd220c0b7d2a" />
+
 
 
 
@@ -242,7 +244,8 @@ Distillation objective:
 Observations: Student models trade some accuracy for much lower inference cost; further multi-teacher distillation and architecture search are planned. 
 
 
-<img width="719" height="388" alt="image" src="https://github.com/user-attachments/assets/137fd8ed-d35b-4f1f-8f0d-44f01effc0f2" />
+<img width="709" height="388" alt="Screenshot 2025-12-03 231114" src="https://github.com/user-attachments/assets/f52e31ce-6fd5-46fb-966c-cb4050f2b241" />
+
 
 
 ---
