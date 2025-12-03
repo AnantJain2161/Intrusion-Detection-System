@@ -234,28 +234,16 @@ Knowledge distillation experiments: teacher (larger LSTM stacks) → student (co
 
 
 
-### 7.2 Deep models (selected)
+### 7.2 Deep models
 
 
-
-| Model                     |                                        Test Accuracy | Precision | Recall |                                           F1 |
-
-| ------------------------- | ---------------------------------------------------: | --------: | -----: | -------------------------------------------: |
-
-| LSTM-Dense (small)        |                                               0.8749 |    0.8847 | 0.8749 |                                     0.8708.  |
-
-| LSTM-Dense (larger)       |                                           0.9643 |    0.9634 | 0.9643 |                                     0.9627.  |
-
-| Autoencoder-Dense         |                                               0.5808 |    0.5354 | 0.5808 |                                     0.4905.  |
-
-| 1-D CNN                   | ≈0.78 (final test range shown on slide; see plots).  |           |        |                                              |
-
-| AE-XLSTM-CNN (hybrid) |                                           0.9818 |         — |      — | 0.9802 (Loss 0.0532, Samples: 234,741).  |
-
-
-
-> Best model: AE-XLSTM-CNN: Accuracy 98.18%, **F1 = 0.9802, Test Loss = **0.0532 on 234,741 samples. 
-
+| Model                   | Test Accuracy | Precision | Recall | F1                                      |
+|-------------------------|--------------:|----------:|-------:|-----------------------------------------:|
+| LSTM-Dense (small)      |        0.8749 |    0.8847 | 0.8749 |                                   0.8708 |
+| LSTM-Dense (larger)     |        0.9643 |    0.9634 | 0.9643 |                                   0.9627 |
+| Autoencoder-Dense       |        0.5808 |    0.5354 | 0.5808 |                                   0.4905 |
+| 1-D CNN                 |   ≈0.78 (see slides) |          |        |                                         |
+| AE-XLSTM-CNN (hybrid)   |        0.9818 |          — |      — | 0.9802 (Loss 0.0532, Samples: 234,741)   |
 
 
 ---
