@@ -203,7 +203,8 @@ Knowledge distillation experiments: teacher (larger LSTM stacks) → student (co
 
 Produced the best metrics across experiments. 
 
-!(https://github.com/user-attachments/assets/5613f6cc-25a6-4134-9056-2842c163657e)
+![image](https://github.com/user-attachments/assets/55bf60ec-764d-4a86-81d8-2eb2b9076cdc)
+
 
 
 
