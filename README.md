@@ -200,17 +200,43 @@ Knowledge distillation experiments: teacher (larger LSTM stacks) → student (co
 
 
 
-* 1. Autoencoder encoder compresses input to latent (e.g., 64–128 dims).
+1. Autoencoder encoder compresses input to latent (e.g., 64–128 dims).
 
-* 2. Extended LSTM (stacked, with dropout) models long temporal context.
+2. Extended LSTM (stacked, with dropout) models long temporal context.
 
-* 3. CNN residual blocks extract hierarchical local patterns.
+3. CNN residual blocks extract hierarchical local patterns.
 
-* 4. Global pooling + classification head (linear → SoftMax for 34 classes).
+4. Global pooling + classification head (linear → SoftMax for 34 classes).
 
-* Produced the best metrics across experiments. 
+Produced the best metrics across experiments. 
 
 
+
+### 6.5. Knowledge distillation (teacher → student)
+
+
+
+Motivation: Deployability requires small, fast models. We distilled a large LSTM teacher into a compact LSTM student.
+
+
+
+Teacher (example): LSTM(128) → Dropout → LSTM(64) → Dense(64) → Dense(32) → logits.
+
+Student (example): LSTM(32) → Dense(32) → logits.
+
+
+
+Distillation objective:
+
+
+
+* Loss_total = α * KL(soft_teacher_logits, soft_student_logits, T) + (1-α) * CE(student_logits, true_labels)
+
+* Empirical settings: T = 4.0, α ≈ 0.7 (representative). 
+
+
+
+Observations: Student models trade some accuracy for much lower inference cost; further multi-teacher distillation and architecture search are planned. 
 
 ---
 
@@ -239,8 +265,8 @@ Knowledge distillation experiments: teacher (larger LSTM stacks) → student (co
 
 | Model                   | Test Accuracy | Precision | Recall | F1                                      |
 |-------------------------|--------------:|----------:|-------:|-----------------------------------------:|
-| LSTM-Dense (small)      |        0.8749 |    0.8847 | 0.8749 |                                   0.8708 |
-| LSTM-Dense (larger)     |        0.9643 |    0.9634 | 0.9643 |                                   0.9627 |
+| LSTM-Dense (1 LSTM layer)      |        0.8749 |    0.8847 | 0.8749 |                                   0.8708 |
+| LSTM-Dense (2 LSTM layers)     |        0.9643 |    0.9634 | 0.9643 |                                   0.9627 |
 | Autoencoder-Dense       |        0.5808 |    0.5354 | 0.5808 |                                   0.4905 |
 | 1-D CNN                 |   ≈0.78 (see slides) |          |        |                                         |
 | AE-XLSTM-CNN (hybrid)   |        0.9818 |          — |      — | 0.9802 (Loss 0.0532, Samples: 234,741)   |
@@ -250,39 +276,7 @@ Knowledge distillation experiments: teacher (larger LSTM stacks) → student (co
 
 
 
-## 8. Knowledge distillation (teacher → student)
-
-
-
-Motivation: Deployability requires small, fast models. We distilled a large LSTM teacher into a compact LSTM student.
-
-
-
-Teacher (example): LSTM(128) → Dropout → LSTM(64) → Dense(64) → Dense(32) → logits.
-
-Student (example): LSTM(32) → Dense(32) → logits.
-
-
-
-Distillation objective:
-
-
-
-* Loss_total = α * KL(soft_teacher_logits, soft_student_logits, T) + (1-α) * CE(student_logits, true_labels)
-
-* Empirical settings: T = 4.0, α ≈ 0.7 (representative). 
-
-
-
-Observations: Student models trade some accuracy for much lower inference cost; further multi-teacher distillation and architecture search are planned. 
-
-
-
----
-
-
-
-## 9. Challenges, failure modes & lessons learned
+## 8. Challenges, failure modes & lessons learned
 
 
 
