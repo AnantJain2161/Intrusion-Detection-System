@@ -187,6 +187,8 @@ Knowledge distillation experiments: teacher (larger LSTM stacks) → student (co
 
 * Effective at local pattern extraction across sequences. 
 
+<img width="736" height="399" alt="image" src="https://github.com/user-attachments/assets/c29bd16b-9d62-42a9-98b0-305db68f0954" />
+
 
 
 ### 6.4 AE-XLSTM-CNN (best performing hybrid)
