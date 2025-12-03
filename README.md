@@ -183,37 +183,6 @@ Input → LSTM(32) → Dropout → FC(32) → ReLU → FC(num_classes)
 
 ---
 
-## Reproducible Repo Structure
-
-```
-/
-├── README.md
-├── requirements.txt
-├── src/
-│   ├── data_ingest.py
-│   ├── preprocessing.py
-│   ├── models/
-│   │   ├── lstm_dense.py
-│   │   ├── ae.py
-│   │   ├── conv1d.py
-│   │   ├── hybrid_ae_xlstm_cnn.py
-│   │   └── distillation.py
-│   ├── train.py
-│   └── evaluate.py
-├── notebooks/
-│   ├── eda.ipynb
-│   └── experiments.ipynb
-├── data/
-│   ├── raw/
-│   └── processed/
-├── results/
-│   ├── figures/
-│   └── metrics/
-
-```
-
----
-
 ## Future Work & Research Directions
 
 - **Adversarial robustness:** Adversarial training and certified defenses for evasion attacks
