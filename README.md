@@ -251,14 +251,18 @@ Observations: Student models trade some accuracy for much lower inference cost; 
 ### 7.2 Deep models
 
 
+
 | Model                   | Test Accuracy | Precision | Recall | F1                                      |
 |-------------------------|--------------:|----------:|-------:|-----------------------------------------:|
 | LSTM-Dense (1 LSTM layer)      |        0.8749 |    0.8847 | 0.8749 |                                   0.8708 |
 | LSTM-Dense (2 LSTM layers)     |        0.9643 |    0.9634 | 0.9643 |                                   0.9627 |
 | Autoencoder-Dense       |        0.5808 |    0.5354 | 0.5808 |                                   0.4905 |
-| 1-D CNN                 |   ≈0.78 (see slides) |          |        |                                         |
-| AE-XLSTM-CNN (hybrid)   |        0.9818 |          — |      — | 0.9802 (Loss 0.0532, Samples: 234,741)   |
-
+| 1-D CNN                 |   0.78 |          |        |                   .76                      |
+| 2-D CNN                 |   0.73 |          |        |                .6916                         |
+| AE-LSTM-CNN  |        0.9848 |          |       | 0.9827   |
+| AE-XLSTM-CNN  |        0.9818 |          |       | 0.9802    |
+| Knowledge Distillation(teacher model)  |        0.96 |           |       |  .95|
+| Knowledge Distillation(student model)  |        0.88 |         .  |      |  .86  |
 
 ---
 
