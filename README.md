@@ -308,8 +308,7 @@ We conducted a comprehensive evaluation across classical and modern deep learnin
 
 
 
-Project Video can be found at : 
-
-
 
 ---
+
+Project Video can be found at : 
