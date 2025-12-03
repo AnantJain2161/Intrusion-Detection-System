@@ -261,8 +261,8 @@ Observations: Student models trade some accuracy for much lower inference cost; 
 | 2-D CNN                 |   0.73 |          |        |                .6916                         |
 | AE-LSTM-CNN  |        0.9848 |          |       | 0.9827   |
 | AE-XLSTM-CNN  |        0.9818 |          |       | 0.9802    |
-| Knowledge Distillation(teacher model)  |        0.96 |           |       |  .95|
-| Knowledge Distillation(student model)  |        0.88 |         .  |      |  .86  |
+| Knowledge Distillation(teacher model)  |        0.96 |           |       |  0.95 |
+| Knowledge Distillation(student model)  |        0.88 |           |      |  0.86  |
 
 ---
 
