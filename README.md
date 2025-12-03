@@ -1,195 +1,341 @@
-# Deep Learning–Based Intrusion Detection System (DL-IDS)
+# Deep Learning–Based Intrusion Detection System (DL-IDS) — Report
+
+
+
+## 1. Executive summary
+
+
+
+This report summarizes our work on designing, training and evaluating deep-learning models for intrusion detection on IoT/network traffic. Using the CIC-IoT2023 dataset and a range of deep architectures (MLP, LSTM, CNN, Autoencoder and hybrid AE-xLSTM-CNN), we compare classical baselines and deep models, address severe class imbalance, explore model compression via knowledge distillation, and identify a deployable hybrid that attains state-of-the-art performance on our test splits. Key takeaway: the AE-XLSTM-CNN hybrid produced the best results (Test Loss 0.0532, **Accuracy 98.18%, **F1 = 0.9802) on the held-out test set of 234,741 samples. 
+
+
 
 ---
 
-## Abstract
 
-This project investigates modern deep learning architectures for intrusion detection on IoT and network traffic datasets. Using the CIC-IoT2023 dataset and a range of DL methods (MLP, CNN, LSTM, Autoencoder, and hybrid AE+LSTM+CNN), we compare performance across architectures, address class imbalance and real-time constraints, and explore model compression via knowledge distillation. The best performing pipeline — an Autoencoder + Extended LSTM + CNN hybrid — achieved **98.18% accuracy** and **F1 score 0.9802** on the test split.
 
----
+## 2. Problem statement & objectives
 
-## Table of Contents
 
-- [Motivation](#motivation)
-- [Dataset: CIC-IoT2023 (overview)](#dataset-cic-iot2023-overview)
-- [Problem Statement & Objectives](#problem-statement--objectives)
-- [Methodology & Model Architectures](#methodology--model-architectures)
-  - [Preprocessing](#preprocessing)
-  - [Architectures Evaluated](#architectures-evaluated)
-- [Architecture Diagrams](#mermaid-architecture-diagrams)
-- [Experiments & Metrics](#experiments--metrics)
-- [Results & Key Observations](#results--key-observations)
-- [Knowledge Distillation (Model Compression)](#knowledge-distillation-model-compression)
-- [Limitations & Practical Considerations](#limitations--practical-considerations)
-- [Reproducible Repo Structure (recommended)](#reproducible-repo-structure-recommended)
-- [Future Work & Research Directions](#next-steps--research-directions)
 
----
+Modern networks (and IoT ecosystems) face increasing automated attacks and frequent novel exploits. The problem this project addresses:
 
-## Motivation
 
-- Rapid increase in cyberattacks (e.g., ransomware predictions) and IoT device vulnerabilities motivate improved, adaptive IDS solutions. The slides report that businesses may face dramatically more frequent attacks by 2031; this motivates resilient ML/DL-based detection systems.
 
----
+* Build a real-time, **robust, and **explainable DL-IDS that:
 
-## Dataset: CIC-IoT2023 (overview)
 
-Key dataset statistics:
 
-- **Files:** 169 files (combined)
-- **Features:** 47 unique columns (features)
-- **Samples (total):** ~46,686,579 records (combined)
-- **Attack types:** 34 unique attack classes (including many DDoS variants, Mirai, Recon, etc.)
+  1. Detects a wide range of attack types (DoS/DDoS, Mirai, Recon, MITM, Port scan, etc.).
 
-### Data Characteristics
+  2. Achieves high detection recall (>95%) while keeping precision high (>90%).
 
-- Highly imbalanced: ~97.6% malicious vs small benign proportion in aggregated visualization
-- Rich feature set suitable for both time-series sequence models (LSTM) and feature-based DL (CNN, Autoencoders)
+  3. Operates with acceptable inference latency for online deployment (<100 ms target).
+
+  4. Adapts to evolving/zero-day attacks and resists adversarial evasion.
+
+  5. Enables model compression (knowledge distillation) for deployment on resource constrained devices.
+
+     All objectives and constraints are derived from the project brief and dataset characteristics. 
+
+
 
 ---
 
-## Problem Statement & Objectives
 
-**Primary goal:** Designing a DL-IDS capable of accurate, real-time detection across diverse IoT/network attack types while being robust and explainable.
 
-### Operational Objectives
+## 3. Dataset: CIC-IoT2023 (summary & key statistics)
 
-1. Detect diverse attack types (DoS, DDoS, Port Scan, Mirai, Recon, MITM, etc.)
-2. High recall (>95%) to minimize missed attacks
-3. High precision (>90%) to reduce false alarms
-4. Real-time inference latency target: <100 ms per decision
-5. Robust to zero-day and adversarial perturbations; provide operator-interpretable outputs
 
----
 
-## Methodology & Model Architectures
+We used the CIC-IoT2023 dataset as the primary data source because it is IoT-focused, recent and diverse.
 
-### Preprocessing
 
-- **Feature engineering:** One-hot encoding for categorical fields; numeric scaling using `StandardScaler`
-- **Handling imbalance:** Class weighting, careful train/test splitting, and anomaly-aware approaches (Autoencoders). The dataset supports both binary and multiclass tasks
 
-### Architectures Evaluated
+Key statistics (aggregated across dataset files):
 
-- **Baseline classical:** Random Forest, clustering (Mini-Batch KMeans) for baseline comparisons
-- **Deep learning models:**
-  - **MLP (Dense)** with >10 layers (paper-style MLP)
-  - **1-D CNN** and **2-D CNN** variants (feature maps from tabular/time windows)
-  - **LSTM-Dense:** Stacked LSTM layers with dropout and dense output (multiple LSTM variants tested)
-  - **Stacked Deep Autoencoder (DAE):** Multiple autoencoder stages for unsupervised representation + classification head
-  - **Hybrid AE + XLSTM + CNN:** Autoencoder for compression, extended LSTM for temporal patterns, CNN for local pattern extraction — best empirical results
 
----
 
-## Architecture Diagrams
+* Total files: 169.
 
-### 1) LSTM → Dense (Teacher model example)
+* Unique features (columns): 47.
 
-```mermaid
-graph TD
-    Input[Input Features timesteps] --> LSTM1[LSTM 128 / return_sequences:true]
-    LSTM1 --> Dropout1[Dropout]
-    Dropout1 --> LSTM2[LSTM 64 / return_sequences:false]
-    LSTM2 --> Dense1[FC 64 -> ReLU]
-    Dense1 --> Dense2[FC 32 -> ReLU]
-    Dense2 --> Output[FC num_classes -> Softmax]
-```
+* Total samples (combined): 46,686,579.
 
-### 2) Student Distilled LSTM (Small)
+* Unique attack types: 34 (many DDoS variants, Mirai, Recon, etc.).
 
-```mermaid
-graph TD
-    Input2[Input Features timesteps] --> SLSTM[LSTM 32]
-    SLSTM --> SDense[FC 32 -> ReLU]
-    SDense --> SOutput[FC num_classes -> Softmax]
-```
+* Approx. class balance: ~97.6% malicious / 2.4% benign (severe imbalance). 
 
-### 3) AE → XLSTM → CNN (Hybrid pipeline)
 
-```mermaid
-graph TD
-    Raw[Raw / Windowed Features] --> AE[Autoencoder Encoder bottleneck]
-    AE --> Bottleneck[Bottleneck Vector]
-    Bottleneck --> XLSTM[Extended LSTM stacked LSTM]
-    XLSTM --> CNN[1D-CNN Layers conv -> pool -> flatten]
-    CNN --> Classifier[Dense -> Softmax Output]
-```
+
+Why CIC-IoT2023?
+
+
+
+* Realistic smart-home / IoT traffic, supports both binary & multiclass tasks, 47 behavioral features suitable for temporal and spatial learning (LSTM, CNN), and wide attack coverage for robust multiclass training. 
+
+
 
 ---
 
-## Experiments & Metrics
 
-Primary metrics reported: Accuracy, Precision, Recall, F1-score, AUC where applicable. Loss functions: Categorical Cross-Entropy. Optimizer: Adam (default in many runs).
 
-Representative experiment notes:
+## 4. Preprocessing & experimental setup
 
-- **Random Forest** used as a baseline: precision/recall curves across training batches provided
-- **Clustering baseline (Mini-Batch KMeans):** Balanced accuracy and F1 indicate severe class imbalance challenges
-- **LSTM variants:** Smaller LSTM (accuracy ~0.8749) vs larger LSTM (accuracy ~0.9643) depending on params and dataset subset
 
----
 
-## Results & Key Observations
+Preprocessing pipeline
 
-### Top-line Result (Final Best Model)
 
-**AE-XLSTM-CNN Hybrid** — Test Loss: 0.0532, Accuracy: 98.18%, F1: 0.9802 on a test set of 234,741 samples
 
-### Other Model Highlights
+* Combine multiple files into unified table(s).
 
-- **Autoencoder-Dense:** Test accuracy ~0.5808 (performed poorly for direct classification when trained in multitask setting)
-- **LSTM-Dense smaller:** Accuracy ~0.8749 (Precision ~0.8847)
-- **LSTM-Dense larger:** Accuracy ~0.9643 (Precision ~0.9634)
+* Handle missing values and outliers (dataset-dependent rules).
 
-### Key Observations
+* Categorical features → one-hot encoding.
 
-- Autoencoder + LSTM + CNN hybrid offers the best trade-off between representational power and robustness
-- Overfitting is a risk for overly complex models on tabular data — simpler architectures sometimes generalize better
-- Memory constraints required batch processing and careful resource management
+* Numeric features → StandardScaler normalization.
 
----
+* Windowing / sequencing for temporal models (sequence length used: 10 in hybrid experiments).
 
-## Knowledge Distillation (Model Compression)
+* Train / validation / test splits ensure attack classes for novelty experiments can be held out if required. 
 
-The project explores teacher→student distillation to produce lightweight models:
 
-### Teacher Model (Example)
 
-Input → LSTM(128) → Dropout → LSTM(64) → Dropout → FC(64) → ReLU → FC(32) → ReLU → FC(num_classes)
+Training environment & hyperparameters (representative)
 
-### Student Model (Distilled)
 
-Input → LSTM(32) → Dropout → FC(32) → ReLU → FC(num_classes)
 
-### Loss Function (Student)
+* Optimizer: Adam.
 
-- **Soft loss:** KL(soft_teacher_logits, soft_student_logits) with temperature T (example T=4) weighted by α (example α=0.7)
-- **Hard loss:** CrossEntropy(student_logits, true_labels)
-- **Final loss:** α × SoftLoss + (1 − α) × HardLoss
+* Loss: Categorical Cross-Entropy for classification; MSE or reconstruction loss for autoencoders.
 
-### Performance
+* Batch sizes: tuned per model to balance GPU memory constraints (batch processing was used to mitigate RAM limits).
 
-- **Teacher performance:** Accuracy ~0.9611, F1 ~0.9598
-- **Student validation best:** ~0.8817 in a given experiment
+* Early stopping, dropout and regularization used where applicable. 
+
+
 
 ---
 
-## Limitations & Practical Considerations
 
-- **Class imbalance:** Some attack classes are severely underrepresented and require tailored strategies (oversampling, focal loss, synthesized samples, or anomaly detection approaches)
-- **Resource constraints:** High memory and compute needs necessitate micro-batching and possibly streaming architectures for deployment
-- **Overfitting risk:** Complex hybrid models may overfit tabular traffic features; cross-validation and simpler architectures can sometimes generalize better
-- **Operationalization:** Real-time demands (<100ms) may require model pruning, quantization, or on-device distillation
+
+## 5. Models evaluated (overview)
+
+
+
+We evaluated a broad set of models to identify trade-offs between complexity, accuracy and deployability:
+
+
+
+1. Classical baselines
+
+
+
+   * Random Forest (feature-based)
+
+   * Mini-Batch KMeans (clustering baseline)
+
+2. Deep / sequence / hybrid models
+
+
+
+   * MLP / Dense (10+ layers — paper style MLP).
+
+   * LSTM → Dense (stacked LSTM variants, including E-LSTM).
+
+   * 1-D CNN and 2-D CNN variants (for sequence and transformed tabular layouts).
+
+   * Autoencoder (stacked DAE) + dense classifier (combined reconstruction + classification loss).
+
+   * AE-XLSTM-CNN (hybrid) — Autoencoder encoder for compression, extended LSTM for temporal modeling, CNN blocks for hierarchical feature extraction, and a classification head. 
+
+
+
+Knowledge distillation experiments: teacher (larger LSTM stacks) → student (compact LSTM) with soft target KL loss plus hard cross-entropy; temperature T and α weighting were applied (representative T=4, α≈0.7). 
+
+
 
 ---
 
-## Future Work & Research Directions
 
-- **Adversarial robustness:** Adversarial training and certified defenses for evasion attacks
-- **Explainability:** Integrate SHAP / LIME for operator-level explanations of alerts
-- **Streaming deployment:** Implement low-latency inference with TensorFlow/TFLite or ONNX (prune/quantize student model)
-- **Data augmentation for rare attacks:** Generative augmentation (GANs / conditional synthesis) to address class imbalance
-- **Ensemble + meta-learner:** Combine anomaly detectors (AE) with discriminative models (LSTM/CNN) using a meta-classifier for calibrated alerts
+
+## 6. Representative architectures (short descriptions)
+
+
+
+### 6.1 LSTM-Dense (compact & deep variants)
+
+
+
+* Two stacked LSTM layers (e.g., 128 → 64 units) → dense SoftMax; dropout between layers.
+
+* Good at sequential dependencies; larger variants reached higher accuracy at cost of params. 
+
+
+
+### 6.2 Autoencoder-Dense
+
+
+
+* Encoder: progressively smaller dense layers → bottleneck.
+
+* Decoder: mirror of encoder.
+
+* Combined loss: reconstruction (MSE) + classification (Cross-Entropy) with weighting factor α for trade-off. Used for anomaly-style detection and representation learning. 
+
+
+
+### 6.3 1-D CNN
+
+
+
+* Several Conv1D blocks (Conv → BN → ReLU → MaxPool → Dropout), flatten → dense classifier.
+
+* Effective at local pattern extraction across sequences. 
+
+
+
+### 6.4 AE-XLSTM-CNN (best performing hybrid)
+
+
+
+* 1. Autoencoder encoder compresses input to latent (e.g., 64–128 dims).
+
+* 2. Extended LSTM (stacked, with dropout) models long temporal context.
+
+* 3. CNN residual blocks extract hierarchical local patterns.
+
+* 4. Global pooling + classification head (linear → SoftMax for 34 classes).
+
+* Produced the best metrics across experiments. 
+
+
 
 ---
 
+
+
+## 7. Results — quantitative summary
+
+
+
+> All reported results below are taken from our experimental runs (see IDS-DL.pdf for detailed plots and per-epoch logs). 
+
+
+
+### 7.1 Baselines
+
+
+
+* Random Forest: stable performance, useful precision/recall trend; limited by imbalance. (See per-batch metrics in slides.) 
+
+* Mini-Batch KMeans (Clustering): Accuracy ~74.9%, Balanced Accuracy ~**35.9%, Weighted F1 ~**68.6% — struggled with rare classes. 
+
+
+
+### 7.2 Deep models (selected)
+
+
+
+| Model                     |                                        Test Accuracy | Precision | Recall |                                           F1 |
+
+| ------------------------- | ---------------------------------------------------: | --------: | -----: | -------------------------------------------: |
+
+| LSTM-Dense (small)        |                                               0.8749 |    0.8847 | 0.8749 |                                     0.8708.  |
+
+| LSTM-Dense (larger)       |                                           0.9643 |    0.9634 | 0.9643 |                                     0.9627.  |
+
+| Autoencoder-Dense         |                                               0.5808 |    0.5354 | 0.5808 |                                     0.4905.  |
+
+| 1-D CNN                   | ≈0.78 (final test range shown on slide; see plots).  |           |        |                                              |
+
+| AE-XLSTM-CNN (hybrid) |                                           0.9818 |         — |      — | 0.9802 (Loss 0.0532, Samples: 234,741).  |
+
+
+
+> Best model: AE-XLSTM-CNN: Accuracy 98.18%, **F1 = 0.9802, Test Loss = **0.0532 on 234,741 samples. 
+
+
+
+---
+
+
+
+## 8. Knowledge distillation (teacher → student)
+
+
+
+Motivation: Deployability requires small, fast models. We distilled a large LSTM teacher into a compact LSTM student.
+
+
+
+Teacher (example): LSTM(128) → Dropout → LSTM(64) → Dense(64) → Dense(32) → logits.
+
+Student (example): LSTM(32) → Dense(32) → logits.
+
+
+
+Distillation objective:
+
+
+
+* Loss_total = α * KL(soft_teacher_logits, soft_student_logits, T) + (1-α) * CE(student_logits, true_labels)
+
+* Empirical settings: T = 4.0, α ≈ 0.7 (representative). 
+
+
+
+Observations: Student models trade some accuracy for much lower inference cost; further multi-teacher distillation and architecture search are planned. 
+
+
+
+---
+
+
+
+## 9. Challenges, failure modes & lessons learned
+
+
+
+1. Severe class imbalance: benign traffic proportion is very small; naive training leads to bias toward dominant attack classes. Techniques explored: class weighting, balanced sampling, anomaly detection approaches (AE). 
+
+2. Memory constraints: initial experiments hit RAM/GPU limits; solution: micro-batching, careful data loaders and feature caching. 
+
+3. Overfitting risk: highly complex architectures overfit tabular traffic; simpler architectures sometimes generalized better. Strong regularization and validation protocols are necessary. 
+
+
+
+---
+
+
+
+## 10. Future work & next steps
+
+
+
+1. Multi-Teacher Knowledge Distillation: combine guidance from several high-performing teacher models to improve student generalization. 
+
+2. Model compression & optimization: pruning, quantization (INT8), dynamic layer scaling and TFLite/ONNX export for edge deployment. 
+
+3. Adversarial robustness: adversarial training and certified defenses to improve resistance to evasion. 
+
+4. Explainability: integrate SHAP/LIME for per-alert interpretability to support security operators. 
+
+5. Continual learning pipeline: automated triage for flagged novel events, human-in-loop validation, and periodic retraining to capture new attack classes. 
+
+
+
+---
+
+
+
+## 12. Conclusion
+
+
+
+We conducted a comprehensive evaluation across classical and modern deep learning approaches for intrusion detection on a large IoT dataset. The hybrid AE-XLSTM-CNN architecture achieved the best trade-off between detection performance and robustness (98.18% accuracy; F1=0.9802). For real-world deployment, the next steps include knowledge distillation, model compression, adversarial hardening, and explainability integration. This line of work moves us toward production-ready, lightweight DL-IDS solutions suitable for high-volume IoT environments. 
+
+
+
+---
