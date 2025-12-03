@@ -178,6 +178,10 @@ Knowledge distillation experiments: teacher (larger LSTM stacks) → student (co
 * Combined loss: reconstruction (MSE) + classification (Cross-Entropy) with weighting factor α for trade-off. Used for anomaly-style detection and representation learning. 
 
 
+<img width="588" height="323" alt="image" src="https://github.com/user-attachments/assets/21fcebd4-ec56-49af-b235-5e2c1bc2d4ff" />
+
+
+
 
 ### 6.3 1-D CNN
 
