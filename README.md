@@ -36,9 +36,6 @@ Modern networks (and IoT ecosystems) face increasing automated attacks and frequ
 
   5. Enables model compression (knowledge distillation) for deployment on resource constrained devices.
 
-     All objectives and constraints are derived from the project brief and dataset characteristics. 
-
-
 
 ---
 
@@ -49,7 +46,6 @@ Modern networks (and IoT ecosystems) face increasing automated attacks and frequ
 
 
 We used the CIC-IoT2023 dataset as the primary data source because it is IoT-focused, recent and diverse.
-
 
 
 Key statistics (aggregated across dataset files):
@@ -71,9 +67,7 @@ Key statistics (aggregated across dataset files):
 Why CIC-IoT2023?
 
 
-
 * Realistic smart-home / IoT traffic, supports both binary & multiclass tasks, 47 behavioral features suitable for temporal and spatial learning (LSTM, CNN), and wide attack coverage for robust multiclass training. 
-
 
 
 ---
@@ -243,11 +237,6 @@ Observations: Student models trade some accuracy for much lower inference cost; 
 
 
 ## 7. Results — quantitative summary
-
-
-
-> All reported results below are taken from our experimental runs (see IDS-DL.pdf for detailed plots and per-epoch logs). 
-
 
 
 ### 7.1 Baselines
