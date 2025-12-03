@@ -1,5 +1,4 @@
-# Deep Learning–Based Intrusion Detection System (DL-IDS) — Report
-
+# Deep Learning–Based Intrusion Detection System (DL-IDS) - Report
 
 
 ## 1. Executive summary
@@ -306,6 +305,10 @@ Observations: Student models trade some accuracy for much lower inference cost; 
 
 
 We conducted a comprehensive evaluation across classical and modern deep learning approaches for intrusion detection on a large IoT dataset. The hybrid AE-XLSTM-CNN architecture achieved the best trade-off between detection performance and robustness (98.18% accuracy; F1=0.9802). For real-world deployment, the next steps include knowledge distillation, model compression, adversarial hardening, and explainability integration. This line of work moves us toward production-ready, lightweight DL-IDS solutions suitable for high-volume IoT environments. 
+
+
+
+Project Video can be found at : 
 
 
 
