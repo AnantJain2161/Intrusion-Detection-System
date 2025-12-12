@@ -5,7 +5,7 @@
 
 
 
-This report summarizes our work on designing, training and evaluating deep-learning models for intrusion detection on IoT/network traffic. Using the CIC-IoT2023 dataset and a range of deep architectures (MLP, LSTM, CNN, Autoencoder and hybrid AE-xLSTM-CNN), we compare classical baselines and deep models, address severe class imbalance, explore model compression via knowledge distillation, and identify a deployable hybrid that attains state-of-the-art performance on our test splits. Key takeaway: the AE-XLSTM-CNN hybrid produced the best results (Test Loss 0.0532, **Accuracy 98.18%, **F1 = 0.9802) on the held-out test set of 234,741 samples. 
+This report summarizes our work on designing, training and evaluating deep-learning models for intrusion detection on IoT/network traffic. Using the CIC-IoT2023 dataset and a range of deep architectures (MLP, LSTM, CNN, Autoencoder and hybrid AE-xLSTM-CNN), we compare classical baselines and deep models, address severe class imbalance, explore model compression via knowledge distillation, and identify a deployable hybrid that attains state-of-the-art performance on our test splits. Key takeaway: the AE-XLSTM-CNN hybrid produced the best results (Test Loss 0.0532, **Accuracy 98.18%**, **F1 = 0.9802**) on the held-out test set of 234,741 samples. 
 
 
 
@@ -21,7 +21,7 @@ Modern networks (and IoT ecosystems) face increasing automated attacks and frequ
 
 
 
-* Build a real-time, **robust, and **explainable DL-IDS that:
+* Build a real-time, **robust**, and **explainable** DL-IDS that:
 
 
 
